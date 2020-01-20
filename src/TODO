@@ -1,0 +1,34 @@
+-*- outline -*-
+
+This document describes future features to be implemented in XMvn.
+
+To request a new feature contact the author on IRC (mizdebsk @
+#fedora-java @ FreeNode), send an email to mizdebsk@redhat.com or
+submit a RFE at Red Hat Bugzilla (product Fedora, component xmvn):
+http://bugzilla.redhat.com/enter_bug.cgi?product=fedora&component=xmvn
+
+
+* Random ideas (no milestone assigned)
+
+** plugin API
+
+
+* Deferred features
+
+** improved configuration
+
+*** final fields
+    some configuration settings cannot be overridden by offspring
+    configuration files
+
+*** configuration from pluginManagement
+    just like Eclipse M2E does
+
+*** singleton configurator
+    configurator should generate configuration once and cache it
+
+*** in tests don't modify configuration directly
+    clone it and customize the clone
+
+** improve compat package resolver
+   maybe version ranges, maybe number of matching components

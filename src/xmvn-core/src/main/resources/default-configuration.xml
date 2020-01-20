@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<configuration xmlns="http://fedorahosted.org/xmvn/CONFIG/1.0.0">
+  <properties/>
+  <buildSettings>
+    <debug>false</debug>
+    <skipTests>false</skipTests>
+  </buildSettings>
+  <resolverSettings>
+    <debug>false</debug>
+  </resolverSettings>
+  <installerSettings>
+    <skipProvides>false</skipProvides>
+    <skipRequires>false</skipRequires>
+  </installerSettings>
+
+  <repositories>
+    <repository>
+      <id>resolve</id>
+      <type>compound</type>
+      <configuration>
+        <repositories/>
+      </configuration>
+    </repository>
+    <repository>
+      <id>install</id>
+      <type>compound</type>
+      <configuration>
+        <repositories/>
+      </configuration>
+    </repository>
+    <repository>
+      <id>install-raw-pom</id>
+      <type>compound</type>
+      <configuration>
+        <repositories/>
+      </configuration>
+    </repository>
+    <repository>
+      <id>install-effective-pom</id>
+      <type>compound</type>
+      <configuration>
+        <repositories/>
+      </configuration>
+    </repository>
+  </repositories>
+</configuration>

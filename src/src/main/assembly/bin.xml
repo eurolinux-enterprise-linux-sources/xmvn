@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!--
+ ! Copyright (c) 2013 Red Hat, Inc.
+ !
+ ! Licensed under the Apache License, Version 2.0 (the "License");
+ ! you may not use this file except in compliance with the License.
+ ! You may obtain a copy of the License at
+ !
+ !     http://www.apache.org/licenses/LICENSE-2.0
+ !
+ ! Unless required by applicable law or agreed to in writing, software
+ ! distributed under the License is distributed on an "AS IS" BASIS,
+ ! WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ ! See the License for the specific language governing permissions and
+ ! limitations under the License.
+ `-->
+<assembly>
+  <id>bin</id>
+  <formats>
+    <format>tar.bz2</format>
+  </formats>
+  <dependencySets>
+    <dependencySet>
+      <useProjectArtifact>false</useProjectArtifact>
+      <useTransitiveDependencies>false</useTransitiveDependencies>
+      <scope>runtime</scope>
+      <outputDirectory>lib/ext</outputDirectory>
+    </dependencySet>
+  </dependencySets>
+  <fileSets>
+    <fileSet>
+      <includes>
+        <include>AUTHORS</include>
+        <include>README</include>
+        <include>LICENSE</include>
+        <include>NOTICE</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>target/dependency/apache-maven-${mavenVersion}</directory>
+      <outputDirectory>.</outputDirectory>
+      <includes>
+        <include>bin/m2.conf</include>
+        <include>bin/mvn</include>
+        <include>bin/mvnDebug</include>
+        <include>bin/mvnyjp</include>
+        <include>conf/settings.xml</include>
+        <include>conf/logging/simplelogger.properties</include>
+        <include>NOTICE.txt</include>
+        <include>**/*.jar</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>xmvn-tools/xmvn-bisect/target/dependency</directory>
+      <outputDirectory>lib/bisect</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>xmvn-tools/xmvn-bisect/target</directory>
+      <outputDirectory>lib/bisect</outputDirectory>
+      <includes>
+        <include>*.jar</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>xmvn-tools/xmvn-install/target/dependency</directory>
+      <outputDirectory>lib/installer</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>xmvn-tools/xmvn-install/target</directory>
+      <outputDirectory>lib/installer</outputDirectory>
+      <includes>
+        <include>*.jar</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>xmvn-tools/xmvn-resolve/target/dependency</directory>
+      <outputDirectory>lib/resolver</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>xmvn-tools/xmvn-resolve/target</directory>
+      <outputDirectory>lib/resolver</outputDirectory>
+      <includes>
+        <include>*.jar</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>xmvn-tools/xmvn-subst/target/dependency</directory>
+      <outputDirectory>lib/subst</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>xmvn-tools/xmvn-subst/target</directory>
+      <outputDirectory>lib/subst</outputDirectory>
+      <includes>
+        <include>*.jar</include>
+      </includes>
+    </fileSet>
+  </fileSets>
+  <files>
+    <file>
+      <source>src/main/bin/xmvn</source>
+      <outputDirectory>bin</outputDirectory>
+      <destName>xmvn</destName>
+      <fileMode>0755</fileMode>
+      <lineEnding>unix</lineEnding>
+    </file>
+    <file>
+      <source>xmvn-tools/src/main/bin/tool-script</source>
+      <outputDirectory>bin</outputDirectory>
+      <destName>xmvn-bisect</destName>
+      <fileMode>0755</fileMode>
+      <lineEnding>unix</lineEnding>
+    </file>
+    <file>
+      <source>xmvn-tools/src/main/bin/tool-script</source>
+      <outputDirectory>bin</outputDirectory>
+      <destName>xmvn-install</destName>
+      <fileMode>0755</fileMode>
+      <lineEnding>unix</lineEnding>
+    </file>
+    <file>
+      <source>xmvn-tools/src/main/bin/tool-script</source>
+      <outputDirectory>bin</outputDirectory>
+      <destName>xmvn-resolve</destName>
+      <fileMode>0755</fileMode>
+      <lineEnding>unix</lineEnding>
+    </file>
+    <file>
+      <source>xmvn-tools/src/main/bin/tool-script</source>
+      <outputDirectory>bin</outputDirectory>
+      <destName>xmvn-subst</destName>
+      <fileMode>0755</fileMode>
+      <lineEnding>unix</lineEnding>
+    </file>
+  </files>
+</assembly>

@@ -1,0 +1,65 @@
+#!/bin/sh
+# Copyright (c) 2012-2013 Red Hat, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# Written by Mikolaj Izdebski <mizdebsk@redhat.com>
+
+set -e
+
+name=xmvn
+ver=$(git describe --tags)
+
+# Decimal integer >= 0
+number="(0|[1-9][0-9]*)"
+# Allowed format of release version
+version_regex="^${number}[.]${number}[.]${number}$"
+
+if ! grep -qE "${version_regex}" <<<"${ver}"; then
+    cat >&2 <<EOF
+Current version '${ver}' is not a correct release version.
+
+Release versions must be in format maj.min.rel; maj >= 0, min >= 0 and rel >= 0
+(they must match ${version_regex} regex).
+EOF
+    exit 1
+fi
+
+tarball=${name}-${ver}.tar.xz
+git archive -v --prefix=${name}-${ver}/ ${ver} | xz >${tarball}
+
+read -e -p "Upload ${tarball} to fedorahosted.org? (y/N): "
+if [ "$REPLY" = y ]; then
+    git push --tags
+    scp ${tarball} fedorahosted.org:${name}
+fi
+
+news=$(sed -n '
+/^*/ {
+    s/..//
+   :l
+    s/^  //
+    p
+    n
+    s/^*//
+    Tl
+    q
+}' src/site/apt/news.apt)
+
+echo
+tee news-${ver}.eml <<EOF
+To: Fedora Java Development List <java-devel@lists.fedoraproject.org>
+Subject: XMvn ${ver} release notes
+
+${news}
+EOF

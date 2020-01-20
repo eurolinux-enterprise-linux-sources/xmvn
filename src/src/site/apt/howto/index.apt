@@ -1,0 +1,28 @@
+            --------------------
+               XMvn Tutorials
+            --------------------
+              Mikolaj Izdebski
+            --------------------
+                 2013-03-15
+
+
+XMvn Tutorials
+
+* How to use XMvn Bisect
+
+  This document describes debugging builds using bisection method with
+  XMvn Bisect.  Here you can find step-by-step walkthrough running
+  XMvn Bisect with some examples.
+
+* How to embed XMvn in your application
+
+  This short tutorial shows how you can use services offered by XMvn
+  from your application.  Provided examples guide how to use local
+  artifact resolver service that can find artifacts installed locally
+  in the system.
+
+* How to create an extension for XMvn
+
+  This tutorial shows how to extend functionality provided by XMvn.
+  It provided examples guiding how to create a very simple extension
+  that allows XMvn to be used to install Eclipse artifacts.
