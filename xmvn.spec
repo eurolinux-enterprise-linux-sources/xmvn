@@ -1,6 +1,6 @@
 Name:           xmvn
 Version:        1.3.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Local Extensions for Apache Maven
 License:        ASL 2.0
 URL:            http://mizdebsk.fedorapeople.org/xmvn
@@ -11,6 +11,7 @@ Patch0001:      0001-Port-to-Maven-3.0.5-and-Sonatype-Aether.patch
 Patch0002:      0002-Remove-integration-with-for-Apache-Ivy.patch
 Patch0003:      0003-Port-to-Sonatype-Sisu.patch
 Patch0004:      0004-Add-support-for-absolute-artifact-symlinks.patch
+Patch0005:      0005-Ignore-runtime-exceptions-thrown-by-ASM.patch
 
 BuildRequires:  maven >= 3.0.5-14
 BuildRequires:  maven-local
@@ -43,6 +44,7 @@ This package provides %{summary}.
 %patch0002 -p1
 %patch0003 -p1
 %patch0004 -p1
+%patch0005 -p1
 
 # remove dependency plugin maven-binaries execution
 # we provide apache-maven by symlink
@@ -148,6 +150,10 @@ end
 %doc LICENSE NOTICE
 
 %changelog
+* Wed Oct  5 2016 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-6
+- Ignore runtime exceptions thrown by ASM
+- Resolves: rhbz#1381883
+
 * Fri Jan 10 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.3.0-5
 - Split 1 patch to 3 patches, one per feature
 - Add support for absolute artifact symlinks

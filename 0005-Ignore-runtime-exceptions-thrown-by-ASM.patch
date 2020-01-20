@@ -1,0 +1,27 @@
+From 614b52d7a3f138c823972fd39ac1ec25c562b1f7 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Fri, 23 Sep 2016 18:18:14 +0200
+Subject: [PATCH 5/5] Ignore runtime exceptions thrown by ASM
+
+---
+ .../java/org/fedoraproject/maven/installer/impl/DefaultInstaller.java | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/DefaultInstaller.java b/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/DefaultInstaller.java
+index efaeeaf..24da603 100644
+--- a/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/DefaultInstaller.java
++++ b/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/DefaultInstaller.java
+@@ -558,6 +558,10 @@ public class DefaultInstaller
+ 
+             return false;
+         }
++        catch ( RuntimeException e )
++        {
++            return false;
++        }
+     }
+ 
+     private void installArtifact( Artifact artifact, String packageName )
+-- 
+2.7.4
+
