@@ -1,0 +1,114 @@
+From 5ba0fab707d9a4bf7ba46d5bf17887f91ad16ca4 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Mon, 6 Jan 2014 14:45:06 +0100
+Subject: [PATCH 4/4] Add support for absolute artifact symlinks
+
+[backport-feature-absolute-symlinks]
+---
+ .../maven/installer/impl/DefaultInstaller.java     | 51 +++++++++++++++++-----
+ .../maven/installer/impl/Package.java              |  6 ++-
+ 2 files changed, 46 insertions(+), 11 deletions(-)
+
+diff --git a/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/DefaultInstaller.java b/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/DefaultInstaller.java
+index e22905f..efaeeaf 100644
+--- a/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/DefaultInstaller.java
++++ b/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/DefaultInstaller.java
+@@ -255,8 +255,7 @@ public class DefaultInstaller
+         for ( Path basePath : basePaths )
+         {
+             if ( basePath.isAbsolute() )
+-                throw new RuntimeException( "Absolute JPP artifact paths are not supported: artifact: " + artifact
+-                    + ", path: " + basePath );
++                continue;
+ 
+             Path jppName = basePath.getFileName();
+             Path jppGroup = Paths.get( "JPP" );
+@@ -280,9 +279,35 @@ public class DefaultInstaller
+             }
+         }
+ 
++        if ( jppArtifacts.isEmpty() )
++            throw new RuntimeException( "At least one non-absolute file must be specified for artifact " + artifact );
++
+         return jppArtifacts;
+     }
+ 
++    private void installAbsoluteSymlinks( Package pkg, Artifact artifact, PackagingRule rule, Path symlinkTarget )
++        throws IOException
++    {
++        List<String> versionSuffixes = new ArrayList<>();
++        for ( String version : rule.getVersions() )
++            versionSuffixes.add( "-" + version );
++        if ( rule.getVersions().isEmpty() )
++            versionSuffixes.add( "" );
++
++        for ( String filePath : rule.getFiles() )
++        {
++            String classifierSuffix = artifact.getClassifier().isEmpty() ? "" : "-" + artifact.getClassifier();
++            String extensionSuffix = artifact.getExtension().isEmpty() ? "" : "." + artifact.getExtension();
++
++            for ( String versionSuffix : versionSuffixes )
++            {
++                Path symlink = Paths.get( filePath + versionSuffix + classifierSuffix + extensionSuffix );
++                if ( symlink.isAbsolute() )
++                    pkg.addSymlink( Paths.get( "/" ).relativize( symlink ), symlinkTarget );
++            }
++        }
++    }
++
+     private void installArtifact( Package pkg, Artifact artifact, List<Artifact> aliases, List<Artifact> jppArtifacts )
+         throws IOException
+     {
+@@ -586,18 +611,24 @@ public class DefaultInstaller
+ 
+             develArtifacts.add( artifact );
+         }
+-        else if ( !isAttachedArtifact )
++        else
+         {
+-            installPomFiles( pkg, artifact, jppArtifacts );
++            Path primaryJppArtifactPath = jppArtifacts.iterator().next().getFile().toPath();
++            installAbsoluteSymlinks( pkg, artifact, rule, primaryJppArtifactPath );
+ 
+-            Set<Artifact> userArtifacts = packageUserArtifacts.get( pkg );
+-            if ( userArtifacts == null )
++            if ( !isAttachedArtifact )
+             {
+-                userArtifacts = new LinkedHashSet<>();
+-                packageUserArtifacts.put( pkg, userArtifacts );
+-            }
++                installPomFiles( pkg, artifact, jppArtifacts );
+ 
+-            userArtifacts.add( artifact );
++                Set<Artifact> userArtifacts = packageUserArtifacts.get( pkg );
++                if ( userArtifacts == null )
++                {
++                    userArtifacts = new LinkedHashSet<>();
++                    packageUserArtifacts.put( pkg, userArtifacts );
++                }
++
++                userArtifacts.add( artifact );
++            }
+         }
+     }
+ 
+diff --git a/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/Package.java b/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/Package.java
+index 104c53d..79140a6 100644
+--- a/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/Package.java
++++ b/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/Package.java
+@@ -83,7 +83,11 @@ class Package
+ 
+     public void addFile( Path file, Path target, int mode )
+     {
+-        addFile( file, target.getParent(), target.getFileName(), mode );
++        Path parent = target.getParent();
++        if ( parent == null )
++            parent = Paths.get( "." );
++
++        addFile( file, parent, target.getFileName(), mode );
+     }
+ 
+     public void addSymlink( Path symlinkFile, Path symlinkTarget )
+-- 
+1.8.4.2
+

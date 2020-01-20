@@ -1,0 +1,174 @@
+From 483dce9795e8a680651115bd7554a58d4fdd3d58 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Thu, 19 Dec 2013 14:58:25 +0100
+Subject: [PATCH 3/4] Port to Sonatype Sisu
+
+[backport-feature-sonatype-sisu]
+---
+ xmvn-connector/pom.xml                                  |  4 ++--
+ xmvn-core/pom.xml                                       | 12 ++++++++++--
+ .../maven/installer/impl/DefaultInstaller.java          | 10 +++++-----
+ xmvn-mojo/pom.xml                                       |  4 ++--
+ xmvn-parent/pom.xml                                     | 17 ++++++++++++++---
+ xmvn-tools/pom.xml                                      |  4 ++--
+ 6 files changed, 35 insertions(+), 16 deletions(-)
+
+diff --git a/xmvn-connector/pom.xml b/xmvn-connector/pom.xml
+index 8b50535..769fd0a 100644
+--- a/xmvn-connector/pom.xml
++++ b/xmvn-connector/pom.xml
+@@ -72,8 +72,8 @@
+       <artifactId>xmvn-core</artifactId>
+     </dependency>
+     <dependency>
+-      <groupId>org.eclipse.sisu</groupId>
+-      <artifactId>org.eclipse.sisu.plexus</artifactId>
++      <groupId>org.sonatype.sisu</groupId>
++      <artifactId>sisu-inject-plexus</artifactId>
+     </dependency>
+   </dependencies>
+ </project>
+diff --git a/xmvn-core/pom.xml b/xmvn-core/pom.xml
+index 79238cd..4bbe6c0 100644
+--- a/xmvn-core/pom.xml
++++ b/xmvn-core/pom.xml
+@@ -50,13 +50,21 @@
+       <artifactId>plexus-component-annotations</artifactId>
+     </dependency>
+     <dependency>
+-      <groupId>org.eclipse.sisu</groupId>
+-      <artifactId>org.eclipse.sisu.plexus</artifactId>
++      <groupId>org.sonatype.sisu</groupId>
++      <artifactId>sisu-inject-plexus</artifactId>
+     </dependency>
+     <dependency>
+       <groupId>org.codehaus.plexus</groupId>
+       <artifactId>plexus-utils</artifactId>
+     </dependency>
++    <dependency>
++      <groupId>asm</groupId>
++      <artifactId>asm</artifactId>
++    </dependency>
++    <dependency>
++      <groupId>asm</groupId>
++      <artifactId>asm-commons</artifactId>
++    </dependency>
+   </dependencies>
+   <build>
+     <plugins>
+diff --git a/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/DefaultInstaller.java b/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/DefaultInstaller.java
+index 3817c7b..e22905f 100644
+--- a/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/DefaultInstaller.java
++++ b/xmvn-core/src/main/java/org/fedoraproject/maven/installer/impl/DefaultInstaller.java
+@@ -48,10 +48,6 @@ import org.codehaus.plexus.component.annotations.Component;
+ import org.codehaus.plexus.component.annotations.Requirement;
+ import org.codehaus.plexus.logging.Logger;
+ import org.codehaus.plexus.util.StringUtils;
+-import org.eclipse.sisu.space.asm.ClassReader;
+-import org.eclipse.sisu.space.asm.ClassVisitor;
+-import org.eclipse.sisu.space.asm.MethodVisitor;
+-import org.eclipse.sisu.space.asm.Opcodes;
+ import org.fedoraproject.maven.config.Configuration;
+ import org.fedoraproject.maven.config.Configurator;
+ import org.fedoraproject.maven.config.InstallerSettings;
+@@ -73,6 +69,10 @@ import org.fedoraproject.maven.resolver.ResolutionResult;
+ import org.fedoraproject.maven.resolver.Resolver;
+ import org.fedoraproject.maven.utils.ArtifactUtils;
+ import org.fedoraproject.maven.utils.LoggingUtils;
++import org.objectweb.asm.ClassReader;
++import org.objectweb.asm.MethodVisitor;
++import org.objectweb.asm.Opcodes;
++import org.objectweb.asm.commons.EmptyVisitor;
+ import org.sonatype.aether.artifact.Artifact;
+ import org.sonatype.aether.util.artifact.DefaultArtifact;
+ 
+@@ -517,7 +517,7 @@ public class DefaultInstaller
+ 
+                 final boolean[] usesNativeCode = new boolean[1];
+ 
+-                new ClassReader( jis ).accept( new ClassVisitor( Opcodes.ASM4 )
++                new ClassReader( jis ).accept( new EmptyVisitor()
+                 {
+                     @Override
+                     public MethodVisitor visitMethod( int flags, String name, String desc, String sig, String[] exc )
+diff --git a/xmvn-mojo/pom.xml b/xmvn-mojo/pom.xml
+index 14505d2..9b9ae1f 100644
+--- a/xmvn-mojo/pom.xml
++++ b/xmvn-mojo/pom.xml
+@@ -68,8 +68,8 @@
+       <artifactId>plexus-component-annotations</artifactId>
+     </dependency>
+     <dependency>
+-      <groupId>org.eclipse.sisu</groupId>
+-      <artifactId>org.eclipse.sisu.plexus</artifactId>
++      <groupId>org.sonatype.sisu</groupId>
++      <artifactId>sisu-inject-plexus</artifactId>
+     </dependency>
+     <dependency>
+       <groupId>org.sonatype.aether</groupId>
+diff --git a/xmvn-parent/pom.xml b/xmvn-parent/pom.xml
+index bfa4da6..76894d2 100644
+--- a/xmvn-parent/pom.xml
++++ b/xmvn-parent/pom.xml
+@@ -75,13 +75,14 @@
+     <project.build.sourceEncoding>US-ASCII</project.build.sourceEncoding>
+ 
+     <aetherVersion>1.13.1</aetherVersion>
++    <asmVersion>3.3.1</asmVersion>
+     <jcommanderVersion>1.32</jcommanderVersion>
+     <mavenInvokerVersion>2.1.1</mavenInvokerVersion>
+     <mavenVersion>3.0.5</mavenVersion>
+     <plexusUtilsVersion>3.0.15</plexusUtilsVersion>
+     <plexusVersion>1.5.5</plexusVersion>
+     <pluginToolsVersion>3.2</pluginToolsVersion>
+-    <sisuVersion>0.0.0.M5</sisuVersion>
++    <sisuVersion>2.3.0</sisuVersion>
+ 
+     <!-- Build dependencies -->
+     <apivizVersion>1.3.2.GA</apivizVersion>
+@@ -155,8 +156,8 @@
+         <version>${plexusVersion}</version>
+       </dependency>
+       <dependency>
+-        <groupId>org.eclipse.sisu</groupId>
+-        <artifactId>org.eclipse.sisu.plexus</artifactId>
++        <groupId>org.sonatype.sisu</groupId>
++        <artifactId>sisu-inject-plexus</artifactId>
+         <version>${sisuVersion}</version>
+       </dependency>
+       <dependency>
+@@ -194,6 +195,16 @@
+         <artifactId>maven-invoker</artifactId>
+         <version>${mavenInvokerVersion}</version>
+       </dependency>
++      <dependency>
++        <groupId>asm</groupId>
++        <artifactId>asm</artifactId>
++        <version>${asmVersion}</version>
++      </dependency>
++      <dependency>
++        <groupId>asm</groupId>
++        <artifactId>asm-commons</artifactId>
++        <version>${asmVersion}</version>
++      </dependency>
+     </dependencies>
+   </dependencyManagement>
+   <dependencies>
+diff --git a/xmvn-tools/pom.xml b/xmvn-tools/pom.xml
+index e1b21a3..8f68dfe 100644
+--- a/xmvn-tools/pom.xml
++++ b/xmvn-tools/pom.xml
+@@ -48,8 +48,8 @@
+       <artifactId>xmvn-core</artifactId>
+     </dependency>
+     <dependency>
+-      <groupId>org.eclipse.sisu</groupId>
+-      <artifactId>org.eclipse.sisu.plexus</artifactId>
++      <groupId>org.sonatype.sisu</groupId>
++      <artifactId>sisu-inject-plexus</artifactId>
+     </dependency>
+   </dependencies>
+   <build>
+-- 
+1.8.4.2
+
